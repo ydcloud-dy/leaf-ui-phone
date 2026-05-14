@@ -209,25 +209,44 @@ onMounted(() => {
 <style scoped>
 .notes {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding-bottom: 60px;
+  background: var(--phone-bg);
+  padding-bottom: 68px;
 }
 
 .notes-container {
   display: flex;
   height: calc(100vh - 46px - 60px);
+  background: var(--phone-bg);
 }
 
 .sidebar {
-  width: 100px;
+  width: 104px;
   flex-shrink: 0;
+  border-right: 1px solid var(--phone-border);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.sidebar :deep(.van-sidebar-item) {
+  background: transparent;
+  color: var(--phone-muted);
+  font-weight: 700;
+}
+
+.sidebar :deep(.van-sidebar-item--select) {
+  color: var(--phone-primary);
+  background: var(--phone-primary-soft);
+}
+
+.sidebar :deep(.van-sidebar-item--select::before) {
+  background: var(--phone-primary);
+  border-radius: 999px;
 }
 
 .notes-content {
   flex: 1;
   overflow-y: auto;
-  background: #f5f7fa;
-  padding: 8px;
+  background: var(--phone-bg);
+  padding: 12px;
 }
 
 .loading-wrapper {
@@ -239,89 +258,98 @@ onMounted(() => {
 .chapters-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* 一级章节 */
 .chapter-item {
-  background: white;
-  border-radius: 8px;
+  border: 1px solid var(--phone-border);
+  border-radius: 12px;
+  background: var(--phone-surface);
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--phone-shadow-sm);
 }
 
 .chapter-header {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
-  background: #409eff;
-  color: white;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(14, 165, 233, 0.04)),
+    var(--phone-surface);
+  color: var(--phone-heading);
   cursor: pointer;
   user-select: none;
   gap: 8px;
 }
 
 .chapter-header:active {
-  background: #3a8ee6;
+  background: var(--phone-primary-soft);
 }
 
 .chapter-name {
   flex: 1;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 850;
+  line-height: 1.35;
 }
 
 .article-count {
   font-size: 13px;
-  opacity: 0.9;
+  color: var(--phone-subtle);
+  font-weight: 700;
 }
 
 .chapter-content {
-  background: white;
+  background: var(--phone-surface);
 }
 
-/* 二级章节 */
 .sub-chapters {
   padding: 0;
 }
 
 .sub-chapter-item {
-  border-top: 1px solid #ebeef5;
+  border-top: 1px solid var(--phone-border);
 }
 
 .sub-chapter-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px 12px 32px;
-  background: #ecf5ff;
-  color: #409eff;
+  padding: 12px 14px 12px 28px;
+  background: var(--phone-surface-soft);
+  color: var(--phone-primary);
   cursor: pointer;
   user-select: none;
   gap: 8px;
-  border-top: 1px solid #d9ecff;
 }
 
 .sub-chapter-header:active {
-  background: #d9ecff;
+  background: var(--phone-primary-soft);
 }
 
 .sub-chapter-name {
   flex: 1;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
-/* 文章列表 */
 .articles-group {
-  background: white;
+  background: var(--phone-surface);
 }
 
 .sub-articles {
-  background: #fafbfc;
+  background: var(--phone-surface-soft);
 }
 
 .article-cell {
-  border-bottom: 1px solid #f0f0f0;
+  background: transparent;
+  border-bottom: 1px solid var(--phone-border);
+}
+
+.article-cell :deep(.van-cell__title) {
+  color: var(--phone-text);
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .article-cell:last-child {
@@ -337,6 +365,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #969799;
+  color: var(--phone-subtle);
+  font-weight: 650;
 }
 </style>

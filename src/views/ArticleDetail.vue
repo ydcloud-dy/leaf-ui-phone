@@ -1,9 +1,24 @@
 <template>
   <div class="article-detail">
+    <van-nav-bar
+      title="文章详情"
+      fixed
+      placeholder
+      left-arrow
+      @click-left="$router.back()"
+    />
+    <div class="read-progress">
+      <span :style="{ width: readingProgress + '%' }"></span>
+    </div>
+
     <van-skeleton :loading="loading" :row="10" avatar>
       <div v-if="article" class="content-wrapper">
         <!-- 文章卡片 -->
         <div class="article-card">
+          <div v-if="article.cover" class="article-cover">
+            <img :src="article.cover" :alt="article.title" />
+          </div>
+
           <!-- 文章头部 -->
           <div class="article-header">
             <h1 class="title">{{ article.title }}</h1>
@@ -91,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import dayjs from 'dayjs'
@@ -105,6 +120,7 @@ const article = ref(null)
 const loading = ref(false)
 const isLiked = ref(false)
 const isFavorited = ref(false)
+const readingProgress = ref(0)
 
 const md = new MarkdownIt({
   html: true,
@@ -134,6 +150,7 @@ const fetchArticle = async () => {
     loading.value = true
     const { data } = await getArticleDetail(route.params.id)
     article.value = data
+    setTimeout(updateReadingProgress, 0)
   } catch (error) {
     showToast('加载文章失败')
     console.error('Failed to fetch article:', error)
@@ -146,7 +163,8 @@ const handleLike = async () => {
   try {
     await likeArticle(article.value.id)
     isLiked.value = !isLiked.value
-    article.value.like_count += isLiked.value ? 1 : -1
+    const nextCount = (Number(article.value.like_count) || 0) + (isLiked.value ? 1 : -1)
+    article.value.like_count = Math.max(0, nextCount)
     showToast(isLiked.value ? '点赞成功' : '取消点赞')
   } catch (error) {
     showToast('操作失败')
@@ -163,42 +181,88 @@ const handleFavorite = async () => {
   }
 }
 
+const updateReadingProgress = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+  readingProgress.value = scrollHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100)) : 0
+}
+
 onMounted(() => {
+  window.addEventListener('scroll', updateReadingProgress, { passive: true })
   fetchArticle()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateReadingProgress)
 })
 </script>
 
 <style scoped>
 .article-detail {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding: 16px;
+  background: var(--phone-bg);
+  padding: 12px;
   padding-bottom: 80px;
 }
 
+.read-progress {
+  position: fixed;
+  top: 46px;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  height: 3px;
+  background: rgba(219, 228, 238, 0.78);
+}
+
+.read-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--phone-primary), var(--phone-accent));
+  transition: width 0.12s ease;
+}
+
 .content-wrapper {
-  max-width: 1200px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
 .article-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--phone-border);
+  border-radius: var(--phone-radius);
+  background: var(--phone-surface);
+  box-shadow: var(--phone-shadow);
   overflow: hidden;
 }
 
+.article-cover {
+  width: 100%;
+  max-height: 230px;
+  overflow: hidden;
+  background: var(--phone-surface-soft);
+}
+
+.article-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 230px;
+  object-fit: cover;
+}
+
 .article-header {
-  padding: 24px 16px;
-  border-bottom: 1px solid #ebeef5;
+  padding: 22px 16px 18px;
+  border-bottom: 1px solid var(--phone-border);
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #303133;
-  line-height: 1.4;
-  margin-bottom: 20px;
+  margin: 0 0 18px;
+  color: var(--phone-heading);
+  font-size: 25px;
+  font-weight: 850;
+  line-height: 1.28;
+  letter-spacing: 0;
 }
 
 .article-meta {
@@ -236,19 +300,20 @@ onMounted(() => {
 
 .author-name {
   font-size: 15px;
-  color: #303133;
-  font-weight: 600;
+  color: var(--phone-heading);
+  font-weight: 800;
 }
 
 .publish-time {
   font-size: 13px;
-  color: #909399;
+  color: var(--phone-subtle);
   margin-top: 4px;
+  font-weight: 650;
 }
 
 .article-stats {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 }
 
 .stat-item {
@@ -256,7 +321,8 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 14px;
-  color: #909399;
+  color: var(--phone-subtle);
+  font-weight: 650;
   white-space: nowrap;
 }
 
@@ -267,36 +333,71 @@ onMounted(() => {
 }
 
 .article-content {
-  padding: 24px 16px;
+  padding: 22px 16px;
   font-size: 16px;
-  line-height: 1.8;
-  color: #303133;
+  line-height: 1.85;
+  color: var(--phone-text);
   word-break: break-word;
 }
 
 .article-content :deep(img) {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 10px;
   margin: 16px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--phone-shadow-sm);
 }
 
 .article-content :deep(pre) {
-  background: #282c34;
+  position: relative;
+  margin: 18px 0;
   padding: 16px;
-  border-radius: 8px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 12px;
+  background: #011627;
   overflow-x: auto;
-  margin: 16px 0;
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.16);
 }
 
 .article-content :deep(code) {
-  font-family: "STHeiti", "Heiti SC", "Microsoft YaHei", "SimHei", monospace;
+  font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    Menlo,
+    monospace;
   font-size: 14px;
+}
+
+.article-content :deep(pre code) {
+  color: #d6deeb;
+  background: transparent;
+  white-space: pre;
+}
+
+.article-content :deep(:not(pre) > code) {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--phone-primary-soft);
+  color: var(--phone-primary);
+  font-size: 0.92em;
 }
 
 .article-content :deep(p) {
   margin: 12px 0;
+}
+
+.article-content :deep(strong) {
+  color: var(--phone-heading);
+  font-weight: 850;
+}
+
+.article-content :deep(hr) {
+  height: 1px;
+  margin: 24px 0;
+  border: 0;
+  background: var(--phone-border);
 }
 
 .article-content :deep(h1),
@@ -306,8 +407,9 @@ onMounted(() => {
 .article-content :deep(h5),
 .article-content :deep(h6) {
   margin: 24px 0 16px;
-  font-weight: 600;
-  color: #303133;
+  font-weight: 850;
+  color: var(--phone-heading);
+  line-height: 1.35;
 }
 
 .article-content :deep(h1) {
@@ -323,13 +425,12 @@ onMounted(() => {
 }
 
 .article-content :deep(blockquote) {
-  border-left: 4px solid #409eff;
-  padding-left: 16px;
   margin: 16px 0;
-  color: #606266;
-  background: #f0f9ff;
-  padding: 12px 16px;
-  border-radius: 4px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--phone-primary);
+  border-radius: 8px;
+  background: var(--phone-primary-soft);
+  color: var(--phone-muted);
 }
 
 .article-content :deep(ul),
@@ -343,7 +444,7 @@ onMounted(() => {
 }
 
 .article-content :deep(a) {
-  color: #409eff;
+  color: var(--phone-primary);
   text-decoration: none;
 }
 
@@ -351,12 +452,33 @@ onMounted(() => {
   text-decoration: underline;
 }
 
+.article-content :deep(table) {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.article-content :deep(th),
+.article-content :deep(td) {
+  min-width: 92px;
+  padding: 8px 10px;
+  border: 1px solid var(--phone-border);
+}
+
+.article-content :deep(th) {
+  background: var(--phone-surface-soft);
+  color: var(--phone-heading);
+  font-weight: 800;
+}
+
 .article-actions {
   padding: 20px 16px;
   display: flex;
   gap: 12px;
-  border-top: 1px solid #ebeef5;
-  background: #fafafa;
+  border-top: 1px solid var(--phone-border);
+  background: var(--phone-surface-soft);
 }
 
 .article-actions .van-button {

@@ -1,9 +1,8 @@
 <template>
   <div class="articles">
-    <!-- Banner区域 - 与PC端一致 -->
     <div class="banner">
       <h1 class="banner-title">文章列表</h1>
-      <p class="banner-subtitle">探索知识的海洋</p>
+      <p class="banner-subtitle">按主题、热度和关键词快速查找内容</p>
     </div>
 
     <div class="container">
@@ -171,67 +170,88 @@ watch(() => route.query, () => {
 <style scoped>
 .articles {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding-bottom: 60px;
+  background: var(--phone-bg);
+  padding-bottom: 68px;
 }
 
-/* Banner - 与PC端一致 */
 .banner {
+  position: relative;
+  overflow: hidden;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.34), rgba(15, 23, 42, 0.86)),
     url('/img/wukong.png');
   background-size: cover;
   background-position: center;
-  background-attachment: scroll;
   color: #fff;
-  padding: 60px 20px;
-  text-align: center;
+  padding: 76px 18px 46px;
+  text-align: left;
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 70px;
+  background: linear-gradient(180deg, transparent, var(--phone-bg));
+  pointer-events: none;
 }
 
 .banner-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 850;
+  line-height: 1.16;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
 }
 
 .banner-subtitle {
-  font-size: 16px;
-  opacity: 0.95;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .container {
-  padding: 16px;
+  position: relative;
+  z-index: 2;
+  margin-top: -24px;
+  padding: 0 14px 16px;
 }
 
 .active-tag-filter {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   padding: 12px 16px;
-  background: #f0f9ff;
-  border-radius: 8px;
-  border-left: 4px solid #409eff;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 12px;
+  background: var(--phone-primary-soft);
 }
 
 .active-tag-filter span {
-  font-weight: 500;
-  color: #606266;
+  color: var(--phone-muted);
   font-size: 14px;
+  font-weight: 700;
 }
 
 .filters-section {
-  margin-bottom: 16px;
-  background: white;
-  border-radius: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid var(--phone-border);
+  border-radius: var(--phone-radius);
+  background: rgba(255, 255, 255, 0.94);
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--phone-shadow-sm);
 }
 
 .sort-section {
-  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+  border-top: 1px solid var(--phone-border);
 }
 
 .articles-list {

@@ -1,16 +1,20 @@
 <template>
   <div class="home">
-    <!-- Banner区域 - 与PC端一致 -->
     <div class="banner">
-      <h1 class="banner-title">欢迎来到我的博客</h1>
-      <p class="banner-subtitle">分享技术，记录生活</p>
+      <p class="banner-kicker">Leaf Blog</p>
+      <h1 class="banner-title">沉淀技术实践，记录系统成长</h1>
+      <p class="banner-subtitle">聚焦 Go、云原生、工程效率和线上问题复盘</p>
+      <div class="banner-actions">
+        <van-button type="primary" size="small" round @click="$router.push('/articles')">阅读文章</van-button>
+        <van-button size="small" round plain @click="$router.push('/notes')">查看笔记</van-button>
+      </div>
     </div>
 
     <div class="container">
       <!-- 热门文章 -->
       <div class="section hot-section">
         <div class="section-header">
-          <h2>🔥 热门文章</h2>
+          <h2>热门文章</h2>
         </div>
         <div class="hot-articles">
           <div
@@ -29,7 +33,7 @@
       <!-- 标签云 -->
       <div class="section tags-section">
         <div class="section-header">
-          <h2>🏷️ 标签云</h2>
+          <h2>标签云</h2>
         </div>
         <div class="tags-cloud">
           <div
@@ -46,8 +50,8 @@
       <!-- 文章列表 -->
       <div class="section articles-section">
         <div class="section-header">
-          <h2>📝 最新文章</h2>
-          <span class="more" @click="$router.push('/articles')">查看更多 →</span>
+          <h2>最新文章</h2>
+          <span class="more" @click="$router.push('/articles')">查看全部</span>
         </div>
 
         <div v-if="loading" class="loading">
@@ -79,23 +83,23 @@
       <!-- 站点统计 -->
       <div class="section stats-section">
         <div class="section-header">
-          <h2>📊 站点统计</h2>
+          <h2>站点统计</h2>
         </div>
         <div class="stats">
           <div class="stat-item">
-            <div class="stat-value">{{ stats.articles || 0 }}</div>
+            <div class="stat-value">{{ formatNumber(stats.articles || 0) }}</div>
             <div class="stat-label">文章数</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ stats.views || 0 }}</div>
+            <div class="stat-value">{{ formatNumber(stats.views || 0) }}</div>
             <div class="stat-label">访问量</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ stats.comments || 0 }}</div>
+            <div class="stat-value">{{ formatNumber(stats.comments || 0) }}</div>
             <div class="stat-label">评论数</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ tags.length }}</div>
+            <div class="stat-value">{{ formatNumber(tags.length) }}</div>
             <div class="stat-label">标签数</div>
           </div>
         </div>
@@ -142,6 +146,8 @@ const fetchArticles = async () => {
     articles.value = data.list || []
     total.value = data.total || 0
     stats.value.articles = data.total || 0
+    stats.value.views = articles.value.reduce((sum, item) => sum + (Number(item.view_count) || 0), 0)
+    stats.value.comments = articles.value.reduce((sum, item) => sum + (Number(item.comment_count) || 0), 0)
   } catch (error) {
     console.error('Failed to fetch articles:', error)
   } finally {
@@ -185,6 +191,13 @@ const handlePageChange = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+const formatNumber = (num) => {
+  const value = Number(num) || 0
+  if (value >= 10000) return `${(value / 10000).toFixed(1)}w`
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
+  return value.toString()
+}
+
 onMounted(() => {
   fetchArticles()
   fetchHotArticles()
@@ -195,115 +208,170 @@ onMounted(() => {
 <style scoped>
 .home {
   min-height: 100vh;
-  background-color: #f5f7fa;
-  padding-bottom: 60px;
+  background: var(--phone-bg);
+  padding-bottom: 68px;
 }
 
-/* Banner - 与PC端一致 */
 .banner {
+  position: relative;
+  overflow: hidden;
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.9) 100%),
     url('/img/wukong.png');
   background-size: cover;
   background-position: center;
-  background-attachment: scroll;
   color: #fff;
-  padding: 60px 20px;
-  text-align: center;
+  padding: 28px 18px 24px;
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 90px;
+  background: linear-gradient(180deg, transparent, var(--phone-bg));
+  pointer-events: none;
+}
+
+.banner-kicker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 10px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .banner-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  max-width: 320px;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 850;
+  line-height: 1.18;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
 }
 
 .banner-subtitle {
-  font-size: 16px;
-  opacity: 0.95;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  max-width: 310px;
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.banner-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.banner-actions :deep(.van-button--plain) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .container {
-  padding: 16px;
+  padding: 0 14px 16px;
+  margin-top: -12px;
+  position: relative;
+  z-index: 2;
 }
 
 .section {
-  margin-bottom: 20px;
-  background: white;
-  border-radius: 12px;
+  margin-bottom: 16px;
   padding: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--phone-border);
+  border-radius: var(--phone-radius);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--phone-shadow-sm);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 14px;
 }
 
 .section-header h2 {
+  margin: 0;
+  color: var(--phone-heading);
   font-size: 18px;
-  font-weight: 600;
-  color: #303133;
+  font-weight: 850;
 }
 
 .more {
-  font-size: 14px;
-  color: #409eff;
+  color: var(--phone-primary);
+  font-size: 13px;
+  font-weight: 750;
   cursor: pointer;
 }
 
-/* 热门文章 */
 .hot-articles {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hot-article-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--phone-surface-soft);
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform 0.18s ease, background-color 0.18s ease;
 }
 
 .hot-article-item:active {
-  background: #e4e7ed;
-  transform: scale(0.98);
+  background: var(--phone-primary-soft);
+  transform: scale(0.985);
 }
 
 .rank {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e4e7ed;
-  color: #606266;
+  background: #e2e8f0;
+  color: var(--phone-muted);
   border-radius: 50%;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 850;
   flex-shrink: 0;
 }
 
 .rank.top {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #facc15, #f97316);
   color: white;
 }
 
 .hot-article-item .title {
   flex: 1;
   font-size: 14px;
-  color: #303133;
+  color: var(--phone-heading);
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -311,11 +379,11 @@ onMounted(() => {
 
 .views {
   font-size: 12px;
-  color: #909399;
+  color: var(--phone-subtle);
   flex-shrink: 0;
+  font-weight: 650;
 }
 
-/* 标签云 */
 .tags-cloud {
   display: flex;
   flex-wrap: wrap;
@@ -324,26 +392,25 @@ onMounted(() => {
 
 .tag-item {
   padding: 6px 12px;
-  background: #f0f9ff;
-  color: #409eff;
+  border: 1px solid rgba(37, 99, 235, 0.16);
   border-radius: 16px;
+  background: var(--phone-primary-soft);
+  color: var(--phone-primary);
   font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s;
-  border: 1px solid #d9ecff;
+  transition: transform 0.18s ease, background-color 0.18s ease;
 }
 
 .tag-item:active {
-  background: #409eff;
+  background: var(--phone-primary);
   color: white;
   transform: scale(0.95);
 }
 
-/* 文章列表 */
 .articles-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .loading {
@@ -352,34 +419,36 @@ onMounted(() => {
 }
 
 .pagination {
-  margin-top: 20px;
+  margin-top: 18px;
   display: flex;
   justify-content: center;
 }
 
-/* 站点统计 */
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .stat-item {
   text-align: center;
-  padding: 12px 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
-  color: white;
+  padding: 12px 6px;
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--phone-primary-soft), #fff);
+  color: var(--phone-primary);
 }
 
 .stat-value {
-  font-size: 20px;
-  font-weight: bold;
+  color: var(--phone-heading);
+  font-size: 18px;
+  font-weight: 850;
   margin-bottom: 4px;
 }
 
 .stat-label {
+  color: var(--phone-muted);
   font-size: 12px;
-  opacity: 0.9;
+  font-weight: 700;
 }
 </style>

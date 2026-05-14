@@ -3,6 +3,9 @@
     <div v-if="article.cover" class="cover">
       <img :src="article.cover" :alt="article.title" />
     </div>
+    <div v-else class="cover cover-placeholder">
+      <van-icon name="description-o" />
+    </div>
 
     <div class="content">
       <h3 class="title">{{ article.title }}</h3>
@@ -120,23 +123,36 @@ const getSummary = () => {
 <style scoped>
 .article-card {
   cursor: pointer;
-  transition: all 0.3s;
-  margin-bottom: 12px;
-  background: white;
-  border-radius: 12px;
+  margin-bottom: 14px;
+  background: var(--phone-surface);
+  border: 1px solid var(--phone-border);
+  border-radius: var(--phone-radius);
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--phone-shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .article-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: scale(0.985);
+  border-color: rgba(37, 99, 235, 0.24);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
 }
 
 .cover {
   width: 100%;
-  height: 180px;
+  height: 172px;
   overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(22, 163, 74, 0.06)),
+    var(--phone-surface-soft);
+}
+
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--phone-primary);
+  font-size: 42px;
 }
 
 .cover img {
@@ -151,17 +167,17 @@ const getSummary = () => {
 }
 
 .content {
-  padding: 16px;
+  padding: 16px 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .title {
+  color: var(--phone-heading);
   font-size: 18px;
-  font-weight: 600;
-  color: #303133;
-  line-height: 1.4;
+  font-weight: 800;
+  line-height: 1.38;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -172,8 +188,8 @@ const getSummary = () => {
 
 .summary {
   font-size: 14px;
-  color: #606266;
-  line-height: 1.6;
+  color: var(--phone-muted);
+  line-height: 1.68;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -186,8 +202,7 @@ const getSummary = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #ebeef5;
+  gap: 12px;
 }
 
 .tags {
@@ -200,7 +215,7 @@ const getSummary = () => {
 
 .stats {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -208,8 +223,9 @@ const getSummary = () => {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
-  color: #909399;
+  color: var(--phone-subtle);
+  font-size: 12px;
+  font-weight: 650;
   white-space: nowrap;
 }
 
@@ -217,20 +233,29 @@ const getSummary = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 4px;
 }
 
 .author {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   font-size: 13px;
-  color: #606266;
+  color: var(--phone-muted);
+  font-weight: 650;
+}
+
+.author span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .avatar-placeholder {
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--phone-primary), #60a5fa);
   color: white;
   display: flex;
   align-items: center;
@@ -241,6 +266,8 @@ const getSummary = () => {
 
 .date {
   font-size: 13px;
-  color: #909399;
+  color: var(--phone-subtle);
+  font-weight: 650;
+  flex-shrink: 0;
 }
 </style>

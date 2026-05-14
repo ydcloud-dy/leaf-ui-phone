@@ -7,31 +7,35 @@
     />
 
     <div class="login-content">
-      <div class="logo">
+      <div class="brand-panel">
         <van-image
           round
           width="80"
           height="80"
           src="/img/touxiang.png"
         />
-        <h1>个人博客</h1>
+        <p class="brand-kicker">Leaf Blog</p>
+        <h1>欢迎回来</h1>
+        <p class="brand-subtitle">登录后可以收藏文章、参与留言和同步个人阅读内容</p>
       </div>
 
-      <van-form @submit="handleLogin">
-        <van-cell-group inset>
+      <van-form class="login-form" @submit="handleLogin">
+        <van-cell-group inset class="form-card">
           <van-field
             v-model="username"
             name="username"
-            label="用户名"
+            left-icon="user-o"
             placeholder="请输入用户名"
+            clearable
             :rules="[{ required: true, message: '请输入用户名' }]"
           />
           <van-field
             v-model="password"
             type="password"
             name="password"
-            label="密码"
+            left-icon="lock"
             placeholder="请输入密码"
+            clearable
             :rules="[{ required: true, message: '请输入密码' }]"
           />
         </van-cell-group>
@@ -92,32 +96,115 @@ const handleLogin = async () => {
 <style scoped>
 .login {
   min-height: 100vh;
+  background: var(--phone-bg);
+  overflow: hidden;
+}
+
+.login::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: 280px;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0.82)),
     url('/img/wukong.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
+  pointer-events: none;
+}
+
+.login::after {
+  content: "";
+  position: fixed;
+  top: 210px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, transparent, var(--phone-bg));
+  pointer-events: none;
 }
 
 .login-content {
-  padding: 40px 20px;
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 46px);
+  padding: 34px 18px 24px;
 }
 
-.logo {
+.brand-panel {
   text-align: center;
-  margin-bottom: 40px;
+  color: #fff;
+  padding: 26px 14px 24px;
 }
 
-.logo h1 {
-  margin-top: 16px;
-  font-size: 24px;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+.brand-panel :deep(.van-image) {
+  border: 3px solid rgba(255, 255, 255, 0.86);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.22);
+}
+
+.brand-kicker {
+  margin: 16px 0 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.brand-panel h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+}
+
+.brand-subtitle {
+  max-width: 286px;
+  margin: 12px auto 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.login-form {
+  margin-top: 8px;
+}
+
+.form-card {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.form-card :deep(.van-cell) {
+  padding: 15px 16px;
+}
+
+.form-card :deep(.van-field__left-icon) {
+  color: var(--phone-primary);
+}
+
+.form-card :deep(.van-field__control) {
+  font-weight: 700;
 }
 
 .submit-btn {
-  margin: 20px 16px;
+  margin: 18px 14px 0;
+}
+
+.submit-btn :deep(.van-button) {
+  height: 46px;
+  border-radius: 13px;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+}
+
+.submit-btn :deep(.van-button__text) {
+  font-size: 16px;
+  font-weight: 850;
+}
+
+@media (min-width: 480px) {
+  .login-content {
+    max-width: 430px;
+    margin: 0 auto;
+  }
 }
 </style>
